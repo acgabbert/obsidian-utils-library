@@ -8,7 +8,8 @@
         "/dist"
     ],
     "dependencies": {
-        "obsidian": "1.5.7-1"
+        "obsidian": "1.5.7-1",
+        "typescript": "^5.4.2"
     },
     "devDependencies": {
         "obsidian": "1.5.7-1"

@@ -1,5 +1,5 @@
 import { TFile } from "obsidian";
-export { defangIp, defangDomain, lowerSha256, lowerMd5, todayLocalDate, todayFolderStructure }
+export { defangIp, defangDomain, friendlyDatetime, lowerSha256, lowerMd5, todayLocalDate, todayFolderStructure }
 
 function todayLocalDate() {
     const tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
