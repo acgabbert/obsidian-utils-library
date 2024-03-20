@@ -1,0 +1,16 @@
+{
+    "name": "obsidian-utils",
+    "version": "0.0.1",
+    "description": "Obsidian plugin utilities.",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "/dist"
+    ],
+    "dependencies": {
+        "obsidian": "1.5.7-1"
+    },
+    "devDependencies": {
+        "obsidian": "1.5.7-1"
+    }
+}
