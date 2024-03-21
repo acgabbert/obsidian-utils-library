@@ -45,7 +45,7 @@ function defangDomain(text: string): string {
      * becomes `hxxps[://]google[.]com`
      * @returns input string with domains defanged
      */
-    return text.replaceAll(/http(s?):\/\/([^\/]*)\.([\/\.]+\/?.*)/g, "hxxp$1[://]$2[.]$3");
+    return text.replaceAll(/http(s?):\/\/([^\/]*)\.([^\/\.]+\/?.*)/g, "hxxp$1[://]$2[.]$3");
 }
 
 function lowerSha256(text: string): string {
