@@ -3,6 +3,11 @@ import { Vault } from 'obsidian';
 export { checkFolderExistsRecursive, createFolderIfNotExists, createNote };
 
 async function checkFolderExistsRecursive(vault: Vault, folderName: string): Promise<string> {
+    /**
+     * Check if a given folder exists
+     * @param rootPath the folder to start searching from
+     * @returns folder name, blank if not exists
+     */
     async function searchFolder(rootPath: string): Promise<string> {
         const checkVal = rootPath + "/" + folderName;
         const folderExists = await vault.adapter.exists(checkVal, true);
@@ -31,6 +36,10 @@ async function checkFolderExistsRecursive(vault: Vault, folderName: string): Pro
 }
 
 async function createFolderIfNotExists(vault: Vault, folderName: string) {
+    /**
+     * Creates a folder if it does not already exist.
+     * @param vault
+     */
     const folder = await checkFolderExistsRecursive(vault, folderName);
     if (!folder) {
         await vault.createFolder(folderName);
@@ -38,5 +47,11 @@ async function createFolderIfNotExists(vault: Vault, folderName: string) {
 }
 
 async function createNote(vault: Vault, folderName: string, noteTitle: string) {
+    /**
+     * Creates a note within the given vault.
+     * @param vault
+     * @param folderName
+     * @param noteTitle
+     */
     await vault.create(`${folderName}/${noteTitle}`, '');
 }

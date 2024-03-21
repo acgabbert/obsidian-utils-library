@@ -36,7 +36,7 @@ function defangIp(text: string): string {
      * Defangs IP addresses, e.g. `8.8.8.8` becomes `8.8.8[.]8`
      * @returns input string with IP addresses defanged
      */
-    return text.replaceAll(/(\d{1,3}\.\d{1,3}\.\d{1,3})\.(\d{1,3}))/g, "$1[.]$2");
+    return text.replaceAll(/(\d{1,3}\.\d{1,3}\.\d{1,3})\.(\d{1,3})/g, "$1[.]$2");
 }
 
 function defangDomain(text: string): string {
