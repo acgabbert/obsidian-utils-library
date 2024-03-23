@@ -53,14 +53,13 @@ async function createNote(vault: Vault, folderName: string, noteTitle: string) {
      * @param folderName
      * @param noteTitle
      */
-    await vault.create(`${folderName}/${noteTitle}`, '');
+    await vault.create(`${folderName}/${noteTitle}.md`, '');
 }
 
 function getUnresolvedBacklinks(notePath: string, app: App): Array<string> {
     const backlinks = app.metadataCache.unresolvedLinks[notePath];
     let retval = []
     for (const i in backlinks) {
-        console.log(`${i} = ${backlinks[i]}`)
         retval.push(i);
     }
     console.log(backlinks);
