@@ -1,6 +1,6 @@
 import { App, Vault } from 'obsidian';
 
-export { checkFolderExistsRecursive, createFolderIfNotExists, createNote, getUnresolvedBacklinks };
+export { checkFolderExistsRecursive, createFolderIfNotExists, createNote, getUnresolvedBacklinks, removeDotObsidian };
 
 async function checkFolderExistsRecursive(vault: Vault, folderName: string): Promise<string> {
     /**
@@ -15,6 +15,7 @@ async function checkFolderExistsRecursive(vault: Vault, folderName: string): Pro
         const subFolders = (await vault.adapter.list(rootPath)).folders;
         // skip .obsidian config folder
         const i = subFolders.indexOf('.obsidian');
+        //i > -1 ? subFolders.splice(i, 1) : {};
         if (i > -1) {
             subFolders.splice(i, 1);
         }
@@ -33,6 +34,15 @@ async function checkFolderExistsRecursive(vault: Vault, folderName: string): Pro
     }
 
     return await searchFolder("");
+}
+
+function removeDotObsidian(folders: Array<string>) {
+    // skip .obsidian config folder
+    const i = folders.indexOf('.obsidian');
+    if (i > -1) {
+        folders.splice(i, 1);
+    }
+    return folders;
 }
 
 async function createFolderIfNotExists(vault: Vault, folderName: string) {

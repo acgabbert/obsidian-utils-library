@@ -81,6 +81,10 @@ function friendlyDatetime(text: string): string {
     return text.replace(/(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\s+UTC)/g, "$1 at $2");
 }
 
+function findByRegex(text: string, regex: RegExp) {
+    
+}
+
 function replaceTemplateText(template: string, clipboard: string, note: TFile) {
     
 }
