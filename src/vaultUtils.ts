@@ -1,6 +1,6 @@
-import { Vault } from 'obsidian';
+import { App, Vault } from 'obsidian';
 
-export { checkFolderExistsRecursive, createFolderIfNotExists, createNote };
+export { checkFolderExistsRecursive, createFolderIfNotExists, createNote, getUnresolvedBacklinks };
 
 async function checkFolderExistsRecursive(vault: Vault, folderName: string): Promise<string> {
     /**
@@ -54,4 +54,15 @@ async function createNote(vault: Vault, folderName: string, noteTitle: string) {
      * @param noteTitle
      */
     await vault.create(`${folderName}/${noteTitle}`, '');
+}
+
+function getUnresolvedBacklinks(notePath: string, app: App): Array<string> {
+    const backlinks = app.metadataCache.unresolvedLinks[notePath];
+    let retval = []
+    for (const i in backlinks) {
+        console.log(`${i} = ${backlinks[i]}`)
+        retval.push(i);
+    }
+    console.log(backlinks);
+    return retval;
 }
