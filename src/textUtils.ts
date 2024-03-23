@@ -1,5 +1,5 @@
 import { TFile } from "obsidian";
-export { defangIp, defangDomain, friendlyDatetime, lowerSha256, lowerMd5, todayLocalDate, todayFolderStructure }
+export { defangIp, defangDomain, findFirstByRegex, friendlyDatetime, lowerSha256, lowerMd5, replaceTemplateText, todayLocalDate, todayFolderStructure }
 
 function todayLocalDate(): string {
     /**
@@ -8,6 +8,13 @@ function todayLocalDate(): string {
     const tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
     const date = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);
     return date;
+}
+
+function localDateTime() {
+    /**
+     * @returns the local date/time in format `YYYY-MM-DD HH:SS`
+     */
+    return `${todayLocalDate()} ${new Date(Date.now()).toString().slice(16, 21)}`
 }
 
 function todayFolderStructure(quarter: boolean): Array<string> {
@@ -81,10 +88,38 @@ function friendlyDatetime(text: string): string {
     return text.replace(/(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\s+UTC)/g, "$1 at $2");
 }
 
-function findByRegex(text: string, regex: RegExp) {
-    
+function findFirstByRegex(text: string, regex: RegExp): string {
+    /**
+     * Find the first match of a regex in the given string.
+     * @param text the text to search
+     * @param regex the regular expression to match
+     * @returns first match of a regex in the given string
+     */
+    const result = regex.exec(text);
+    if (!result) {
+        throw Error;
+    } else {
+        return result[1]
+    }
 }
 
-function replaceTemplateText(template: string, clipboard: string, note: TFile) {
-    
+function replaceTemplateText(template: string, content: string, note: TFile, contentMacro: string = "{{content}}") {
+    /**
+     * Put a template around the given content.
+     * Supported macros: 
+     * - {{title}} the note title
+     * - {{date}} the date in format YYYY-MM-DD
+     * - {{time}} the time in format HH:SS
+     * - {{content}} the content you want to replace'
+     * @param template the template
+     * @param content the content
+     * @param note the note to which it will be inserted
+     * @param contentMacro the string to replace content with @default "{{content}}"
+     */
+    var template_replaced = template.replaceAll("{{title}}", note.name.slice(0, -3));
+    const dateTime = localDateTime().split(" ");
+    template_replaced = template_replaced.replaceAll("{{date}}", dateTime[0]);
+    template_replaced = template_replaced.replaceAll("{{time}}", dateTime[1]);
+    template_replaced = template_replaced.replaceAll(contentMacro, content);
+    return template_replaced;
 }
