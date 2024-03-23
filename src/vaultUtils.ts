@@ -57,6 +57,12 @@ async function createNote(vault: Vault, folderName: string, noteTitle: string) {
 }
 
 function getUnresolvedBacklinks(notePath: string, app: App): Array<string> {
+    /**
+     * Get an array of the unresolved backlinks in a note.
+     * @param notePath the note to check
+     * @param app the current App class instance
+     * @returns an array of strings
+     */
     const backlinks = app.metadataCache.unresolvedLinks[notePath];
     let retval = []
     for (const i in backlinks) {
