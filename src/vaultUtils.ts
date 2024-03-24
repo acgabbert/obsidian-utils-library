@@ -1,4 +1,4 @@
-import { App, Vault } from 'obsidian';
+import { App, TFile, Vault } from 'obsidian';
 
 export { checkFolderExistsRecursive, createFolderIfNotExists, createNote, getUnresolvedBacklinks, removeDotObsidian };
 
@@ -56,14 +56,15 @@ async function createFolderIfNotExists(vault: Vault, folderName: string) {
     }
 }
 
-async function createNote(vault: Vault, folderName: string, noteTitle: string) {
+async function createNote(vault: Vault, folderName: string, noteTitle: string): Promise<TFile> {
     /**
      * Creates a note within the given vault.
      * @param vault
      * @param folderName
      * @param noteTitle
+     * @returns the note
      */
-    await vault.create(`${folderName}/${noteTitle}.md`, '');
+    return await vault.create(`${folderName}/${noteTitle}.md`, '');
 }
 
 function getUnresolvedBacklinks(notePath: string, app: App): Array<string> {
