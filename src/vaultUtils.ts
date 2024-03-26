@@ -74,11 +74,11 @@ function getUnresolvedBacklinks(notePath: string, app: App): Array<string> {
      * @param app the current App class instance
      * @returns an array of strings
      */
+    console.log(app.metadataCache.unresolvedLinks);
     const backlinks = app.metadataCache.unresolvedLinks[notePath];
     let retval = []
     for (const i in backlinks) {
         retval.push(i);
     }
-    console.log(backlinks);
     return retval;
 }
