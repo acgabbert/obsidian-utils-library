@@ -7,6 +7,7 @@ export {
     getBacklinks,
     noteAppend,
     noteReplace,
+    openNote,
     removeDotObsidian
 };
 
@@ -121,4 +122,13 @@ function noteReplace(vault: Vault, note: TFile, regex: RegExp, content: string):
     return vault.process(note, (data) => {
         return data.replace(regex, content);
     });
+}
+
+function openNote(app: App, note: TFile) {
+    /**
+     * Opens the note
+     * @param app the current App class instance
+     * @param note the file you would like to open
+     */
+    app.workspace.openLinkText(note.name, note.parent.path, true);
 }
