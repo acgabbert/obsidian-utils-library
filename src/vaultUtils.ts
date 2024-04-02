@@ -96,13 +96,28 @@ function getBacklinks(notePath: string, app: App, resolved: boolean = false): Ar
     return retval;
 }
 
-function noteAppend(vault: Vault, note: TFile, content: string) {
+function noteAppend(vault: Vault, note: TFile, content: string): Promise<string> {
+    /**
+     * Append to the end of a note
+     * @param vault the current vault
+     * @param note the note to append to
+     * @param content the content to append
+     * @returns the modified content
+     */
     return vault.process(note, (data) => {
         return data + content;
     });
 }
 
-function noteReplace(vault: Vault, note: TFile, regex: RegExp, content: string) {
+function noteReplace(vault: Vault, note: TFile, regex: RegExp, content: string): Promise<string> {
+    /**
+     * Replace content in a note by regular expression
+     * @param vault the current vault
+     * @param note the note to append to
+     * @param regex the pattern to match for replacement
+     * @param content the content to replace with 
+     * @returns the modified content
+     */
     return vault.process(note, (data) => {
         return data.replace(regex, content);
     });
