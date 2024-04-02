@@ -1,6 +1,14 @@
 import { App, TFile, Vault } from 'obsidian';
 
-export { checkFolderExistsRecursive, createFolderIfNotExists, createNote, getBacklinks, removeDotObsidian };
+export { 
+    checkFolderExistsRecursive,
+    createFolderIfNotExists,
+    createNote,
+    getBacklinks,
+    noteAppend,
+    noteReplace,
+    removeDotObsidian
+};
 
 async function checkFolderExistsRecursive(vault: Vault, folderName: string): Promise<string> {
     /**
@@ -86,4 +94,16 @@ function getBacklinks(notePath: string, app: App, resolved: boolean = false): Ar
         retval.push(i);
     }
     return retval;
+}
+
+function noteAppend(vault: Vault, note: TFile, content: string) {
+    return vault.process(note, (data) => {
+        return data + content;
+    });
+}
+
+function noteReplace(vault: Vault, note: TFile, regex: RegExp, content: string) {
+    return vault.process(note, (data) => {
+        return data.replace(regex, content);
+    });
 }
