@@ -1,6 +1,6 @@
 import { App, TFile, Vault } from 'obsidian';
 
-export { checkFolderExistsRecursive, createFolderIfNotExists, createNote, getUnresolvedBacklinks, removeDotObsidian };
+export { checkFolderExistsRecursive, createFolderIfNotExists, createNote, getBacklinks, removeDotObsidian };
 
 async function checkFolderExistsRecursive(vault: Vault, folderName: string): Promise<string> {
     /**
@@ -67,15 +67,20 @@ async function createNote(vault: Vault, folderName: string, noteTitle: string): 
     return await vault.create(`${folderName}/${noteTitle}.md`, '');
 }
 
-function getUnresolvedBacklinks(notePath: string, app: App): Array<string> {
+function getBacklinks(notePath: string, app: App, resolved: boolean = false): Array<string> {
     /**
      * Get an array of the unresolved backlinks in a note.
      * @param notePath the note to check
      * @param app the current App class instance
+     * @param resolved whether or not you want resolved links
      * @returns an array of strings
      */
-    console.log(app.metadataCache.unresolvedLinks);
-    const backlinks = app.metadataCache.unresolvedLinks[notePath];
+    let backlinks = null;
+    if (resolved) {
+        backlinks = app.metadataCache.resolvedLinks[notePath];
+    } else {
+        backlinks = app.metadataCache.unresolvedLinks[notePath];
+    }
     let retval = []
     for (const i in backlinks) {
         retval.push(i);
