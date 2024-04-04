@@ -138,6 +138,13 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
 }
 
 async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string> {
+    /**
+     * Upon copying a code block, replace macros surrounded by double curly braces
+     * e.g. {{macro}}
+     * with user input.
+     * @param evt a mouse event
+     * @param app the current App class instance 
+     */
     let text = "";
     const macroRegex = /\{\{([^\}])\}\}/g;
     const target = <HTMLButtonElement>evt.target;
