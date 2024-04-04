@@ -146,7 +146,7 @@ async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string>
      * @param app the current App class instance 
      */
     let text = "";
-    const macroRegex = /\{\{([^\}])\}\}/g;
+    const macroRegex = /\{\{([^\}]+)\}\}/g;
     const target = <HTMLButtonElement>evt.target;
     // check for copy code button in preview mode
     if (target.parentElement?.firstChild && target['className'] === 'copy-code-button') {
