@@ -167,7 +167,7 @@ async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string>
                 });
             }).open();
             await new Promise(resolve => {
-                const loop = (): void | number => userInput.size === matchArray.length ? resolve(userInput) : setTimeout(loop)
+                const loop = (): void | any => userInput.size === matchArray.length ? resolve(userInput) : setTimeout(loop)
                 loop();
             });
             userInput.forEach((value, key) => {
