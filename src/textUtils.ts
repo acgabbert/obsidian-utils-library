@@ -1,5 +1,18 @@
-import { TFile } from "obsidian";
-export { defangIp, defangDomain, findFirstByRegex, friendlyDatetime, lowerSha256, lowerMd5, replaceTemplateText, todayLocalDate, todayFolderStructure }
+import { App, Modal, Notice, Setting, TFile } from "obsidian";
+export {
+    defangIp,
+    defangDomain,
+    ErrorModal,
+    findFirstByRegex,
+    friendlyDatetime,
+    InputModal,
+    lowerSha256,
+    lowerMd5,
+    parameterizeCodeBlock,
+    replaceTemplateText,
+    todayLocalDate,
+    todayFolderStructure
+}
 
 function todayLocalDate(): string {
     /**
@@ -122,4 +135,104 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
     template_replaced = template_replaced.replaceAll("{{time}}", dateTime[1]);
     template_replaced = template_replaced.replaceAll(contentMacro, content);
     return template_replaced;
+}
+
+async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string> {
+    let text = "";
+    const macroRegex = /\{\{([^\}])\}\}/g;
+    const target = <HTMLButtonElement>evt.target;
+    // check for copy code button in preview mode
+    if (target.parentElement?.firstChild && target['className'] === 'copy-code-button') {
+        const child = <HTMLElement>target.parentElement.firstChild;
+        text = <string>child.innerText;
+        let matches = [...text.matchAll(macroRegex)];
+        let userInput = new Map<string, string>();
+        if (matches.length > 0) {
+            let matchArray: string[] = [];
+            matches.forEach((match) => {
+                if (!matchArray.includes(match[1])) {
+                    matchArray.push(match[1]);
+                }
+            });
+            new InputModal(app, matchArray, (input) => {
+                input.forEach(async (value, key) => {
+                    userInput.set(`{{${key}}}`, value);
+                });
+            }).open();
+            await new Promise(resolve => {
+                const loop = (): void | number => userInput.size === matchArray.length ? resolve(userInput) : setTimeout(loop)
+                loop();
+            });
+            userInput.forEach((value, key) => {
+                text = text.replaceAll(key, value);
+            });
+            await navigator.clipboard.writeText(text);
+            new Notice('Copied parameterized script to clipboard!')
+        } else {
+            console.log('No parameter matches');
+        }
+    }
+    return text;
+}
+
+class InputModal extends Modal {
+    input: Map<string, string>;
+    params: string[];
+    onSubmit: (input: Map<string, string>) => void;
+
+    constructor(app: App, matches: string[], onSubmit: (result: Map<string, string>) => void) {
+        super(app);
+        this.params = matches;
+        this.input = new Map();
+        this.onSubmit = onSubmit;
+    }
+
+    onOpen(): void {
+        const {contentEl} = this;
+        contentEl.createEl("h1", {text: "Input Parameters:"});
+        
+        this.params.forEach((param) => {
+            new Setting(contentEl)
+                .setName(param)
+                .addText((text) =>
+                    text.onChange((input) => {
+                        this.input.set(param, input);
+                    }));
+        });
+
+        new Setting(contentEl)
+            .addButton((btn) =>
+                btn
+                    .setButtonText("Submit")
+                    .setCta()
+                    .onClick(() => {
+                        this.close();
+                        this.onSubmit(this.input);
+                    }));
+    }
+
+    onClose(): void {
+        const {contentEl} = this;
+        contentEl.empty();
+    }
+}
+
+class ErrorModal extends Modal {
+    text: string;
+
+    constructor(app: App, text: string) {
+        super(app);
+        this.text = text;
+    }
+
+    onOpen() {
+        const {contentEl} = this;
+        contentEl.createEl("h1", {text: "Error"});
+        contentEl.createEl("div", {text: this.text});
+    }
+
+    onClose() {
+        const {contentEl} = this;
+        contentEl.empty();
+    }
 }
