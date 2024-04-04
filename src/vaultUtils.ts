@@ -1,4 +1,4 @@
-import { App, TFile, Vault } from 'obsidian';
+import { App, Setting, TFile, Vault } from 'obsidian';
 
 export { 
     checkFolderExistsRecursive,
@@ -130,5 +130,5 @@ function openNote(app: App, note: TFile) {
      * @param app the current App class instance
      * @param note the file you would like to open
      */
-    app.workspace.openLinkText(note.name, note.parent.path, true);
+    app.workspace.openLinkText(note.name, note.parent!.path, true);
 }
