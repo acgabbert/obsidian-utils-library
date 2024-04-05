@@ -10,6 +10,7 @@ export {
     lowerSha256,
     lowerMd5,
     parameterizeCodeBlock,
+    parseCodeBlocks,
     replaceMacros,
     replaceTemplateText,
     todayLocalDate,
@@ -217,4 +218,21 @@ function addUniqueValuesToArray(array: string[], values: IterableIterator<RegExp
         }
     });
     return array;
+}
+
+function parseCodeBlocks(content: string): Map<string, string> {
+    /**
+     * Parse code blocks and the headers before them
+     * @param content file content
+     * @returns a mapping of headers to code blcok content
+     */
+    let retval = new Map();
+    const codeBlockRegex = /#+\s+(.+)$\n+```\w*\n(((?!^```\n).|\n)*)\n^```$/gm;
+    let matchArray = [...content.matchAll(codeBlockRegex)];
+    matchArray.forEach((match) => {
+        if (!retval.has(match[1])) {
+            retval.set(match[1], match[2]);
+        }
+    });
+    return retval;
 }
