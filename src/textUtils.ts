@@ -1,5 +1,6 @@
 import { App, Modal, Notice, Setting, TFile } from "obsidian";
 export {
+    addUniqueValuesToArray,
     defangIp,
     defangDomain,
     ErrorModal,
@@ -139,11 +140,13 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
 
 async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string> {
     /**
-     * Upon copying a code block, replace macros surrounded by double curly braces
+     * Upon copying a code block in preview mode, 
+     * replace macros surrounded by double curly braces 
      * e.g. {{macro}}
      * with user input.
      * @param evt a mouse event
-     * @param app the current App class instance 
+     * @param app the current App class instance
+     * @returns the code block text with macros replaces
      */
     let text = "";
     const macroRegex = /\{\{([^\}]+)\}\}/g;
@@ -152,15 +155,10 @@ async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string>
     if (target.parentElement?.firstChild && target['className'] === 'copy-code-button') {
         const child = <HTMLElement>target.parentElement.firstChild;
         text = <string>child.innerText;
-        let matches = [...text.matchAll(macroRegex)];
+        let matches = text.matchAll(macroRegex)
         let userInput = new Map<string, string>();
-        if (matches.length > 0) {
-            let matchArray: string[] = [];
-            matches.forEach((match) => {
-                if (!matchArray.includes(match[1])) {
-                    matchArray.push(match[1]);
-                }
-            });
+        let matchArray = addUniqueValuesToArray([], matches);
+        if (matchArray.length > 0) {
             new InputModal(app, matchArray, (input) => {
                 input.forEach(async (value, key) => {
                     userInput.set(`{{${key}}}`, value);
@@ -174,12 +172,28 @@ async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string>
                 text = text.replaceAll(key, value);
             });
             await navigator.clipboard.writeText(text);
-            new Notice('Copied parameterized script to clipboard!')
+            new Notice('Copied parameterized content to clipboard!')
         } else {
             console.log('No parameter matches');
         }
     }
     return text;
+}
+
+function addUniqueValuesToArray(array: string[], values: IterableIterator<RegExpMatchArray>): string[] {
+    /**
+     * Add unique values from the passed RegExpMatchArray to the given array of strings
+     * @param array an array of strings
+     * @param values a set of regex matches
+     * @returns the passed array with unique values added
+     */
+    let valueArray = [...values];
+    valueArray.forEach((match) => {
+        if (!array.includes(match[1])) {
+            array.push(match[1]);
+        }
+    });
+    return array;
 }
 
 class InputModal extends Modal {
