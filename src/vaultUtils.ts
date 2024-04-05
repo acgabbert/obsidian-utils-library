@@ -45,13 +45,20 @@ async function checkFolderExistsRecursive(vault: Vault, folderName: string): Pro
     return await searchFolder("");
 }
 
-function removeDotObsidian(folders: Array<string>) {
-    // skip .obsidian config folder
-    const i = folders.indexOf('.obsidian');
-    if (i > -1) {
-        folders.splice(i, 1);
-    }
-    return folders;
+function removeDotObsidian(files: Array<string>) {
+    /**
+     * Remove .obsidian config folder, .DS_Store file from a list of file/folder names
+     * @param files an array of file/folder names
+     * @returns the array with unnecessary files removed
+     */
+    const removals = ['.obsidian', '.DS_Store'];
+    removals.forEach((value) => {
+        const i = files.indexOf(value);
+        if (i > -1) {
+            files.splice(i, 1);
+        }
+    })
+    return files;
 }
 
 async function createFolderIfNotExists(vault: Vault, folderName: string) {
