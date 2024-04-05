@@ -93,13 +93,14 @@ function lowerMd5(text: string): string {
     });
 }
 
+const dateTimeRegex = /(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\s+UTC)/g;
 function friendlyDatetime(text: string): string {
     /**
      * Converts a datetime string in the format `YYYY-MM-DD HH:MM:SS UTC`
      * to the following: `YYYY-MM-DD at HH:MM:SS UTC`
      * @returns input string with datetimes converted to "{date} at {time}"
      */
-    return text.replace(/(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\s+UTC)/g, "$1 at $2");
+    return text.replace(dateTimeRegex, "$1 at $2");
 }
 
 function findFirstByRegex(text: string, regex: RegExp): string {
@@ -138,6 +139,31 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
     return template_replaced;
 }
 
+function extractMacros(text: string): string[] {
+    /**
+     * Extract macros 
+     * @param text
+     * @returns a unique list of macros in the text
+     */
+    const macroRegex = /(\{\{[^\}]+\}\})/g;
+    let matches = text.matchAll(macroRegex);
+    return addUniqueValuesToArray([], matches);
+}
+
+function replaceMacros(text: string, replacements: Map<string, string>): string {
+    /**
+     * Replace (1:1) keys with their associated values in the provided text.
+     * @param text the text in which to replace
+     * @param replacements the map of keys to values
+     * @returns the input with replaced text
+     */
+    let retval = text;
+    replacements.forEach((value, key) => {
+        retval = retval.replaceAll(key, value);
+    });
+    return retval;
+}
+
 async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string> {
     /**
      * Upon copying a code block in preview mode, 
@@ -149,28 +175,24 @@ async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string>
      * @returns the code block text with macros replaces
      */
     let text = "";
-    const macroRegex = /\{\{([^\}]+)\}\}/g;
     const target = <HTMLButtonElement>evt.target;
     // check for copy code button in preview mode
     if (target.parentElement?.firstChild && target['className'] === 'copy-code-button') {
         const child = <HTMLElement>target.parentElement.firstChild;
         text = <string>child.innerText;
-        let matches = text.matchAll(macroRegex)
+        let matchArray = extractMacros(text);
         let userInput = new Map<string, string>();
-        let matchArray = addUniqueValuesToArray([], matches);
         if (matchArray.length > 0) {
             new InputModal(app, matchArray, (input) => {
                 input.forEach(async (value, key) => {
-                    userInput.set(`{{${key}}}`, value);
+                    userInput.set(`${key}`, value);
                 });
             }).open();
             await new Promise(resolve => {
                 const loop = (): void | any => userInput.size === matchArray.length ? resolve(userInput) : setTimeout(loop)
                 loop();
             });
-            userInput.forEach((value, key) => {
-                text = text.replaceAll(key, value);
-            });
+            text = replaceMacros(text, userInput);
             await navigator.clipboard.writeText(text);
             new Notice('Copied parameterized content to clipboard!')
         } else {
